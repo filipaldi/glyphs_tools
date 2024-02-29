@@ -32,6 +32,7 @@ def generate_instances(font, axis_ranges, num_steps, batch_size):
         batch_count += 1
         if batch_count % batch_size == 0 or i + batch == total_combinations:
             print(f"Batch {batch_count}/{(total_combinations // batch_size) + (1 if total_combinations % batch_size else 0)} completed.")
+            font.save() # Save the `.glyphs` file after processing each batch
     
     print("Instance generation completed.")
 
@@ -41,8 +42,8 @@ axis_ranges = {
     'tilt': (0, 100),
     'wght': (0, 150),
 }
-num_steps = 8  # Define the number of steps per axis
-batch_size = 3  # Define the number of instances to process in each batch
+num_steps = 10  # Define the number of steps per axis
+batch_size = 5  # Define the number of instances to process in each batch
 
 # Get the current font
 font = Glyphs.font
