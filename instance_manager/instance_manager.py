@@ -1,6 +1,16 @@
 # InstaGen Script for Glyphs 3+
 from GlyphsApp import GSInstance, GSAxis, GSFont
 
+def remove_old_instances(font):
+    existing_instances_count = len(font.instances)
+    if existing_instances_count > 0:
+        font.instances = []  # Remove all existing instances
+        font.save()  # Save the .glyphs file after removing instances
+        print(f"{existing_instances_count} old instances removed and file saved.")
+    else:
+        print("No existing instances found. Continuing with instance generation.")
+        # No need to save the file if no instances are found and none are removed
+
 def generate_instances(font, axis_ranges, num_steps, batch_size):
     axes = list(axis_ranges.keys())
     steps = {axis: [(axis_ranges[axis][1] - axis_ranges[axis][0]) / (num_steps - 1) * step + axis_ranges[axis][0] for step in range(num_steps)] for axis in axes}
@@ -32,8 +42,8 @@ def generate_instances(font, axis_ranges, num_steps, batch_size):
         batch_count += 1
         if batch_count % batch_size == 0 or i + batch == total_combinations:
             print(f"Batch {batch_count}/{(total_combinations // batch_size) + (1 if total_combinations % batch_size else 0)} completed.")
-            font.save() # Save the `.glyphs` file after processing each batch
-    
+            font.save()  # Save the .glyphs file after processing each batch
+
     print("Instance generation completed.")
 
 # Script parameters
@@ -42,11 +52,14 @@ axis_ranges = {
     'tilt': (0, 100),
     'wght': (0, 150),
 }
-num_steps = 10  # Define the number of steps per axis
+num_steps = 8  # Define the number of steps per axis
 batch_size = 5  # Define the number of instances to process in each batch
 
 # Get the current font
 font = Glyphs.font
+
+# Remove old instances before generating new ones
+remove_old_instances(font)
 
 # Call the function to generate instances
 generate_instances(font, axis_ranges, num_steps, batch_size)
