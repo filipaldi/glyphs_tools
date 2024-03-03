@@ -1,17 +1,4 @@
-@@ -1,105 +0,0 @@
 # encoding: utf-8
-
-###########################################################################################################
-#
-#
-#	Amicus Plugin
-#
-#	Read the docs:
-#	https://github.com/schriftgestalt/GlyphsSDK/tree/master/Python%20Templates/Reporter
-#
-#
-###########################################################################################################
-
 
 from __future__ import division, print_function, unicode_literals
 import objc
@@ -20,87 +7,61 @@ from GlyphsApp.plugins import *
 
 class AmicusImporter(ReporterPlugin):
 
-	@objc.python_method
-	def settings(self):
-		self.menuName = Glyphs.localize({
-			'en': 'Amicus SVG Importer',
-			'de': 'Amicus',
-			'fr': 'Amicus',
-			'es': 'Amicus',
-			'pt': 'Amicus',
-			})
-		self.generalContextMenus = [{
-			'name': Glyphs.localize({
-				'en': 'Do something',
-				'de': 'Tu etwas',
-				'fr': 'Faire quelque chose',
-				'es': 'Hacer algo',
-				'pt': 'Faça alguma coisa',
-				}), 
-			'action': self.doSomething_
-			}]
+    @objc.python_method
+    def settings(self):
+        self.menuName = Glyphs.localize({'en': 'Amicus SVG Importer', 'de': 'Amicus SVG Importer'})
+        self.keyboardShortcut = 'p'  # Example shortcut, change as needed
+        self.keyboardShortcutModifier = NSControlKeyMask
+        self.generalContextMenus = [
+            {"name": Glyphs.localize({'en': "Layer info in Macro Window", 'de': "Layer-Info im Makro-Fenster"}), "action": self.printInfo},
+        ]
 
-	@objc.python_method
-	def foreground(self, layer):
-		NSColor.controlTextColor().set()
-		NSBezierPath.fillRect_(layer.bounds)
-		self.drawTextAtPoint(layer.parent.name, NSPoint(0, 0))
+    @objc.python_method
+    def start(self):
+        # Your initialization code goes here...
+        pass
 
-	@objc.python_method
-	def inactiveLayerForeground(self, layer):
-		NSColor.selectedTextColor().set()
-		if layer.paths:
-			layer.bezierPath.fill()
-		if layer.components:
-			NSColor.findHighlightColor().set()
-			for component in layer.components:
-				component.bezierPath.fill()
+    @objc.python_method
+    def foreground(self, layer):
+        # Example: Draw a blue rectangle on top of the glyph's bounding box
+        NSColor.blueColor().set()
+        NSBezierPath.fillRect_(layer.bounds)
 
-	@objc.python_method
-	def preview(self, layer):
-		NSColor.textColor().set()
-		if layer.paths:
-			layer.bezierPath.fill()
-		if layer.components:
-			NSColor.highlightColor().set()
-			for component in layer.components:
-				component.bezierPath.fill()
-	
-	def doSomething_(self, sender):
-		print('Just did something')
+    @objc.python_method
+    def background(self, layer):
+        # Example: Draw a red rectangle behind the glyph's bounding box
+        NSColor.redColor().set()
+        NSBezierPath.fillRect_(layer.bounds)
 
-	@objc.python_method
-	def conditionalContextMenus(self):
+    @objc.python_method
+    def inactiveLayerForeground(self, layer):
+        # Example: Drawing in inactive glyphs (the glyphs left and right of the active glyph)
+        if layer.paths:
+            NSColor.blueColor().set()
+            layer.bezierPath.fill()
 
-		# Empty list of context menu items
-		contextMenus = []
+        if layer.components:
+            NSColor.redColor().set()
+            for component in layer.components:
+                component.bezierPath.fill()
 
-		# Execute only if layers are actually selected
-		if Glyphs.font.selectedLayers:
-			layer = Glyphs.font.selectedLayers[0]
-			
-			# Exactly one object is selected and it’s an anchor
-			if len(layer.selection) == 1 and type(layer.selection[0]) == GSAnchor:
-					
-				# Add context menu item
-				contextMenus.append({
-					'name': Glyphs.localize({
-						'en': 'Do something else',
-						'de': 'Tu etwas anderes',
-						'fr': 'Faire aute chose',
-						'es': 'Hacer algo más',
-						'pt': 'Faça outra coisa',
-						}), 
-					'action': self.doSomethingElse_
-					})
+    @objc.python_method
+    def conditionalContextMenus(self):
+        contextMenus = []
+        if Glyphs.font.selectedLayers:
+            layer = Glyphs.font.selectedLayers[0]
+            contextMenus.append({"name": Glyphs.localize({'en': 'Import SVG for Glyph', 'de': 'SVG für Glyph importieren'}), "action": self.importSVGForGlyph_})
+        return contextMenus
 
-		# Return list of context menu items
-		return contextMenus
+    def importSVGForGlyph_(self, sender):
+        print('Import SVG action triggered')
+        # Implement the SVG import logic here
 
-	def doSomethingElse_(self, sender):
-		print('Just did something else')
+    def printInfo(self, sender=None):
+        print("Layer info printed in Macro Window")
+        # You can expand this method to print more useful information
 
-	@objc.python_method
-	def __file__(self):
-		"""Please leave this method unchanged"""
-		return __file__
+    @objc.python_method
+    def __file__(self):
+        """Please leave this method unchanged"""
+        return __file__
