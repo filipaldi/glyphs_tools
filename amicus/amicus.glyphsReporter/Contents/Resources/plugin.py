@@ -18,12 +18,12 @@ import objc
 from GlyphsApp import *
 from GlyphsApp.plugins import *
 
-class ____PluginClassName____(ReporterPlugin):
+class AmicusImporter(ReporterPlugin):
 
 	@objc.python_method
 	def settings(self):
 		self.menuName = Glyphs.localize({
-			'en': 'Amicus',
+			'en': 'Amicus SVG Importer',
 			'de': 'Amicus',
 			'fr': 'Amicus',
 			'es': 'Amicus',
