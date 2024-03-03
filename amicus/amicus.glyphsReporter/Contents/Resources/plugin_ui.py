@@ -1,51 +1,65 @@
 import vanilla
+from GlyphsApp import Glyphs
 
-class AmicusPlugin(GSReporterPlugin):
-    def settings(self):
-        self.menuName = 'Amicus Batch Importer'
+class AmicusPluginUI:
+    def __init__(self):
+        self.w = vanilla.FloatingWindow((400, 240), "Amicus Batch Importer")
 
-    def start(self):
-        pass
-
-    def __file__(self):
-        """Please set this path to where your script is in your system."""
-        return "/path/to/your/plugin/AmicusPlugin.py"
-
-    def showBatchImportDialog(self):
-        self.w = vanilla.FloatingWindow((400, 110), "Batch Import SVG", minSize=(400, 110), maxSize=(600, 110), autosaveName="com.yourname.AmicusPlugin.mainwindow")
-
+        # Directory Selection
         self.w.text_description = vanilla.TextBox((15, 12, -10, 14), "Select the directory containing SVG files:", sizeStyle='small')
         self.w.directoryPath = vanilla.EditText((15, 30, 270, 22), placeholder="No directory selected", sizeStyle='small', readOnly=True)
-        self.w.selectDirectoryButton = vanilla.Button((290, 30, 100, 20), "Select Directory", sizeStyle='small', callback=self.selectDirectory)
-        
-        self.w.importButton = vanilla.Button((15, 70, -10, 20), "Start Batch Import", sizeStyle='small', callback=self.startImport)
+        self.w.selectDirectoryButton = vanilla.Button((290, 30, 100, 20), "Select", callback=self.selectDirectory)
 
+        # Progress and Status Feedback
+        self.w.progressBar = vanilla.ProgressBar((15, 70, -15, 12))
+        self.w.statusLabel = vanilla.TextBox((15, 90, -15, 14), "", sizeStyle='small')
+
+        # Batch Import Customization (Optional UI elements for future implementation)
+        # self.w.customOptionCheckBox = vanilla.CheckBox((15, 114, -15, 20), "Custom Option", callback=self.toggleCustomOption, value=True)
+
+        # Import Button
+        self.w.importButton = vanilla.Button((15, 200, -15, 20), "Start Batch Import", callback=self.startImport)
         self.w.setDefaultButton(self.w.importButton)
 
         self.w.open()
 
     def selectDirectory(self, sender):
-        directoryPath = vanilla.dialogs.getFolder("Select a directory containing SVG files")
-        if directoryPath:
-            self.directoryPath = directoryPath
-            self.w.directoryPath.set(self.directoryPath)
-        else:
-            self.directoryPath = None
-            self.w.directoryPath.set("No directory selected")
+        try:
+            directoryPath = vanilla.dialogs.getFolder("Select a directory containing SVG files")
+            if directoryPath:
+                self.directoryPath = directoryPath
+                self.w.directoryPath.set(self.directoryPath)
+                self.updateStatus("Directory selected successfully.")
+            else:
+                self.directoryPath = None
+                self.w.directoryPath.set("No directory selected")
+                self.updateStatus("Directory selection cancelled.")
+        except Exception as e:
+            Glyphs.showMacroWindow()
+            print("Error selecting directory: {}".format(e))
+            self.updateStatus("Failed to select directory.")
 
     def startImport(self, sender):
-        if self.directoryPath:
-            self.performBatchImport(self.directoryPath)
-        else:
-            vanilla.dialogs.message("Directory not selected", "Please select a directory containing SVG files before starting the import.")
+        if not self.directoryPath:
+            self.updateStatus("No directory selected. Please select a directory first.")
+            return
+
+        # Placeholder for validation and import logic
+        self.updateStatus("Starting import...")
+        # Implement the validation and import logic here
+        # Update progress bar as necessary
+        # self.w.progressBar.set(0.5) # Example progress update
+
+        self.updateStatus("Import completed successfully.")
+
+    def updateStatus(self, message):
+        self.w.statusLabel.set(message)
 
     def performBatchImport(self, directoryPath):
-        # Placeholder for import logic
+        # Placeholder for batch import logic
         print(f"Importing SVGs from {directoryPath}")
+        # Update UI based on import progress and results
 
-# Don't forget to replace 'AmicusPlugin' with the actual name of your class
-# To load your plugin in Glyphs, instantiate it and call the showBatchImportDialog method when appropriate
 if __name__ == "__main__":
-    Glyphs.clearLog() # Clears Macro window log
-    plugin = AmicusPlugin()
-    plugin.showBatchImportDialog()
+    Glyphs.clearLog()  # Clears Macro window log
+    pluginUI = AmicusPluginUI()
