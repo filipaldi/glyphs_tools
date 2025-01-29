@@ -1,4 +1,3 @@
-# InstaGen Script for Glyphs 3+
 from GlyphsApp import GSInstance, GSAxis, GSFont
 
 def remove_old_instances(font):
