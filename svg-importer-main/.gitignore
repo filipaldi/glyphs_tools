@@ -1,0 +1,7 @@
+
+# Ignore Directories
+/organising
+
+# Ignore Files
+*.glyphs
+.DS_Store

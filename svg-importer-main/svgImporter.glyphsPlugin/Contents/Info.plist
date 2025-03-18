@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleExecutable</key>
+    <string>plugin</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.AmicusCorp.Amicus</string>
+    <key>CFBundleName</key>
+    <string>Amicus</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string> <!-- Assuming initial release -->
+    <key>CFBundleVersion</key>
+    <string>1</string> <!-- Assuming initial build -->
+    <key>NSPrincipalClass</key>
+    <string>LTTRSVGImporter</string>
+    <key>PyMainFileNames</key>
+    <array>
+        <string>plugin.py</string>
+    </array>
+    <!-- Optional URLs, these should be specified when available -->
+    <key>UpdateFeedURL</key>
+    <string></string>
+    <key>productPageURL</key>
+    <string></string>
+    <key>productReleaseNotes</key>
+    <string></string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright, Amicus Corp, 2024</string>
+</dict>
+</plist>
