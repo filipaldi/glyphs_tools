@@ -1,4 +1,5 @@
 from GlyphsApp import GSInstance, GSAxis, GSFont
+import time
 
 def remove_old_instances(font):
     existing_instances_count = len(font.instances)
@@ -31,28 +32,33 @@ def generate_instances(font, axis_ranges, num_steps, batch_size):
             for axis_index, axis in enumerate(axes):
                 axis_step_index = (instance_position // (num_steps ** axis_index)) % num_steps
                 axis_value = steps[axis][axis_step_index]
-                instance_name.append(f"{axis}{int(axis_value):03d}")
+                instance_name.append(f"{int(axis_value):03d}")
                 instance.setAxisValueValue_forId_(axis_value, font.axes[axis_index].axisId)
             
-            instance.name = ''.join(instance_name)
+            instance.name = ' '.join(instance_name)
             font.instances.append(instance)
         
         batch_count += 1
         if batch_count % batch_size == 0 or i + batch == total_combinations:
             print(f"Batch {batch_count}/{(total_combinations // batch_size) + (1 if total_combinations % batch_size else 0)} completed.")
-            font.save() 
+            font.save()
+            
+            print(f"Waiting for 10 seconds to let Glyphs process...")
+            time.sleep(10) # Add a short pause to let Glyphs process and recover
+            print(f"Resuming instance generation...")
 
     print("Instance generation completed.")
 
 # Script parameters
 axis_ranges = {
-    'SSHP': (0, 100),
-    'SWGT': (0, 100),
+    '001': (0, 100),
+    '002': (0, 100),
+    'SWGT': (20, 100),
     'TCON': (0, 100),
-    'TTIL': (0, 150)
+    'TTIL': (30, 150),
 }
-num_steps = 6    # Define the number of steps per axis
-batch_size = 12  # Define the number of instances to process in each batch
+num_steps = 2    # Define the number of steps per axis
+batch_size = 32  # Define the number of instances to process in each batch
 
 font = Glyphs.font
 remove_old_instances(font)
