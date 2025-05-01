@@ -8,30 +8,26 @@ import os
 
 def export_font_files(font, axis_ranges, num_steps, export_path, export_formats=["OTF"], 
                       batch_size=10, pause_after_instance=0.5, pause_after_batch=5):
-    """
-    Export font files directly without creating instances in the Glyphs file.
-    Uses the same grid logic as instance_manager.py to create temporary instances.
-    """
     if not os.path.exists(export_path):
         os.makedirs(export_path)
         print(f"Created export directory: {export_path}")
     
-    # Setup format configurations
-    primary_format = "OTF"  
-    containers = [PLAIN]
+    format_choice = export_formats[0]
+    containers = []
     
-    web_formats = []
-    for fmt in export_formats:
-        if fmt in ["OTF", "TTF"]:
-            primary_format = fmt
-        elif fmt in ["WOFF", "WOFF2"]:
-            web_formats.append(fmt)
-    
-    format_map = {"WOFF": WOFF, "WOFF2": WOFF2}
-    for fmt in web_formats:
-        if fmt in format_map:
-            containers.append(format_map[fmt])
-            print(f"Will generate {fmt} format")
+    if format_choice in ["WOFF", "WOFF2"]:
+        base_format = "OTF"  
+        
+        if format_choice == "WOFF":
+            containers = [WOFF]
+            print(f"Will generate WOFF format")
+        else:  
+            containers = [WOFF2]
+            print(f"Will generate WOFF2 format")
+    else:
+        base_format = format_choice
+        containers = [PLAIN]
+        print(f"Will generate {base_format} format")
     
     # Calculate all possible combinations
     axes = list(axis_ranges.keys())
@@ -46,7 +42,6 @@ def export_font_files(font, axis_ranges, num_steps, export_path, export_formats=
     print(f"Formats to export: {', '.join(export_formats)}")
     print(f"Export directory: {export_path}")
     
-    # Process in batches
     batch_count = 0
     processed_count = 0
     
@@ -55,36 +50,30 @@ def export_font_files(font, axis_ranges, num_steps, export_path, export_formats=
         print(f"Processing batch {batch_count + 1}: {batch} fonts")
         
         for b in range(batch):
-            # Create a temporary instance (won't be added to the font)
             temp_instance = GSInstance()
             instance_name = []
             instance_position = i + b
             
-            # Configure instance axis values
             for axis_index, axis in enumerate(axes):
                 axis_step_index = (instance_position // (num_steps ** axis_index)) % num_steps
                 axis_value = steps[axis][axis_step_index]
                 instance_name.append(f"{int(axis_value):03d}")
                 temp_instance.setAxisValueValue_forId_(axis_value, font.axes[axis_index].axisId)
             
-            # Set instance name
             instance_name_str = ' '.join(instance_name)
             temp_instance.name = instance_name_str
             
-            # Prepare to export this instance
             print(f"Preparing to export font: {temp_instance.name}")
             
-            # Set the temporary instance in the font
             temp_instance.font = font
             
-            # Export the font file directly
             try:
                 filename = f"{font.familyName}-{temp_instance.name.replace(' ', '')}"
                 
-                print(f"Exporting to: {export_path}/{filename}.{primary_format.lower()}")
+                print(f"Exporting to: {export_path}/{filename}.{format_choice.lower()}")
                 
                 result = temp_instance.generate(
-                    format=primary_format, 
+                    format=base_format, 
                     fontPath=export_path, 
                     autoHint=True, 
                     removeOverlap=True,
@@ -118,7 +107,7 @@ def export_font_files(font, axis_ranges, num_steps, export_path, export_formats=
 # ===== CONFIGURATION =====
 # Edit these settings as needed
 
-# Axes to interpolate (axis_name: (min_value, max_value))
+# Set your axis tags and ranges here
 AXIS_RANGES = {
     '001': (0, 100),
     '002': (0, 100),
@@ -128,20 +117,19 @@ AXIS_RANGES = {
 }
 
 # Number of steps per axis
-NUM_STEPS = 9  # Small number for testing, increase as needed
+NUM_STEPS = 5
 
 # Export settings
 EXPORT_PATH = os.path.expanduser("~/Desktop/lttrface-export-woff2")
 
 # Font formats to export
-# First OTF/TTF in the list will be used as the primary format
 # Valid options: "OTF", "TTF", "WOFF", "WOFF2"
 EXPORT_FORMATS = ["WOFF2"]
 
 # Batch processing settings
 BATCH_SIZE = 6  # Number of instances to process in each batch
 PAUSE_AFTER_INSTANCE = 0.5  # Seconds to pause after exporting each instance
-PAUSE_AFTER_BATCH = 5  # Seconds to pause after each batch
+PAUSE_AFTER_BATCH = 3  # Seconds to pause after each batch
 
 # ===== RUN SCRIPT =====
 font = Glyphs.font
