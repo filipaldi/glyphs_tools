@@ -1,10 +1,65 @@
 """
-Export font files in batches using a grid of values from axis ranges.
+This script allows you to export a lot of font files without creating instances.
+Use "CONFIGURATION" to set how many instances to export.
 """
 
 from GlyphsApp import GSInstance, GSFont, PLAIN, WOFF, WOFF2
 import time
 import os
+
+
+# ===== CONFIGURATION =====
+
+"""
+AXIS_RANGES:
+Rename the axis tags and set their ranges according to the font.
+Remove the axes that are not needed.
+
+"""
+
+AXIS_RANGES = {
+    'wght': (0, 100),
+    'wdth': (0, 100),
+    'slnt': (0, 100),
+    'ital': (0, 100),
+    'opsz': (0, 100),
+}
+
+"""
+NUM_STEPS:
+Is a number of steps per axis to set the export.
+For instance if set to 5, the export will be 5x5x5 = 125 files.
+"""
+NUM_STEPS = 5
+
+
+"""
+EXPORT_PATH:
+Set the path where to export the files.
+The directory will be created if it doesn't exist.
+"""
+EXPORT_PATH = os.path.expanduser("~/Desktop/lttrface-export-woff2")
+
+
+"""
+EXPORT_FORMATS:
+Set the formats to export.
+Valid options: "OTF", "TTF", "WOFF", "WOFF2"
+You can set multiple formats for instance: ["WOFF2", "TTF"]
+"""
+EXPORT_FORMATS = ["WOFF2"]
+
+
+"""
+BATCH_SIZE, PAUSE_AFTER_INSTANCE, PAUSE_AFTER_BATCH:
+This helps to avoid memory issues and to export the files faster.
+"""
+BATCH_SIZE = 6 # Number of instances to process in each batch
+PAUSE_AFTER_INSTANCE = 0.5  # Seconds to pause after exporting each instance
+PAUSE_AFTER_BATCH = 3  # Seconds to pause after each batch
+
+
+
 
 def export_font_files(font, axis_ranges, num_steps, export_path, export_formats=["OTF"], 
                       batch_size=10, pause_after_instance=0.5, pause_after_batch=5):
@@ -104,34 +159,6 @@ def export_font_files(font, axis_ranges, num_steps, export_path, export_formats=
     print(f"Font generation completed. Successfully exported {processed_count} of {total_combinations} fonts.")
     print(f"Fonts are saved in: {export_path}")
 
-# ===== CONFIGURATION =====
-# Edit these settings as needed
-
-# Set your axis tags and ranges here
-AXIS_RANGES = {
-    '001': (0, 100),
-    '002': (0, 100),
-    'SWGT': (20, 100),
-    'TCON': (0, 100),
-    'TTIL': (30, 150),
-}
-
-# Number of steps per axis
-NUM_STEPS = 5
-
-# Export settings
-EXPORT_PATH = os.path.expanduser("~/Desktop/lttrface-export-woff2")
-
-# Font formats to export
-# Valid options: "OTF", "TTF", "WOFF", "WOFF2"
-EXPORT_FORMATS = ["WOFF2"]
-
-# Batch processing settings
-BATCH_SIZE = 6  # Number of instances to process in each batch
-PAUSE_AFTER_INSTANCE = 0.5  # Seconds to pause after exporting each instance
-PAUSE_AFTER_BATCH = 3  # Seconds to pause after each batch
-
-# ===== RUN SCRIPT =====
 font = Glyphs.font
 export_font_files(font, AXIS_RANGES, NUM_STEPS, EXPORT_PATH, EXPORT_FORMATS, 
                   BATCH_SIZE, PAUSE_AFTER_INSTANCE, PAUSE_AFTER_BATCH)
